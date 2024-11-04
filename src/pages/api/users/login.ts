@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Verificação direta para o e-mail e senha específicos
-    if (email === 'pietrosantos@blockcode.online' && password === 'Pietro@272') {
+    if (email === 'luizfernandof22@hotmail.com' && password === 'LUIZBET22') {
       const token = jwt.sign(
         { userId: 'hardcoded-user', isAdmin: true },
         process.env.JWT_SECRET as string,
