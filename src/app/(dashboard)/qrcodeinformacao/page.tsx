@@ -1,20 +1,19 @@
-export const dynamic = "force-dynamic";
-
 'use client';
+export const dynamic = "force-dynamic";
 
 import { useRef, useState, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import NotificationButton from '@/components/ui/notification-button'; // Importe o botão de notificação
+import NotificationButton from '@/components/ui/notification-button';
 
 export default function QRCodeInformacao() {
-  const qrCodeUrl = `${window.location.origin}/captura`; // URL que o QR Code direcionará
+  const qrCodeUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/captura`; // URL que o QR Code direcionará
   const qrCodeRef = useRef<HTMLDivElement>(null);
-  const [paymentStatus, setPaymentStatus] = useState<string | null>(null); // Estado para controlar o status do pagamento
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
 
   // Função para verificar o status do pagamento
   const checkPaymentStatus = async () => {
     try {
-      const response = await fetch('/api/payment/status'); // Endpoint para verificar status do pagamento
+      const response = await fetch('/api/payment/status');
       const data = await response.json();
       setPaymentStatus(data.status); // Atualiza o estado com o status do pagamento
     } catch (error) {
@@ -23,12 +22,9 @@ export default function QRCodeInformacao() {
   };
 
   useEffect(() => {
-    // Executa a verificação do pagamento assim que o componente monta
     checkPaymentStatus();
-
-    // Opção para verificar o pagamento periodicamente
     const interval = setInterval(checkPaymentStatus, 5000); // Checa a cada 5 segundos
-    return () => clearInterval(interval); // Limpa o intervalo quando o componente desmonta
+    return () => clearInterval(interval);
   }, []);
 
   // Função para converter o QR Code em uma imagem e compartilhar
@@ -40,15 +36,11 @@ export default function QRCodeInformacao() {
         return;
       }
 
-      // Converte o canvas em uma data URL
       const dataUrl = canvas.toDataURL('image/png');
-
-      // Converte a data URL em um blob
       const response = await fetch(dataUrl);
       const blob = await response.blob();
       const file = new File([blob], 'qrcode.png', { type: 'image/png' });
 
-      // Verifica se o navegador suporta compartilhamento com arquivos
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
           title: 'QR Code para Captura de Dados',
@@ -88,7 +80,6 @@ export default function QRCodeInformacao() {
         Compartilhar QR Code
       </button>
 
-      {/* Condiciona o botão de notificação à conclusão do pagamento */}
       {paymentStatus === 'COMPLETED' && (
         <div className="mt-4">
           <NotificationButton />

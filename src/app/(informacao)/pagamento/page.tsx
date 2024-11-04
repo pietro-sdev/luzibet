@@ -1,22 +1,20 @@
-export const dynamic = "force-dynamic";
-
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 
-export default function PagamentoPage() {
+const PagamentoPage = () => {
   const [qrCodeBase64, setQrCodeBase64] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const paymentId = searchParams ? searchParams.get('paymentId') : null; // Obtém o `paymentId` dos parâmetros
+  const paymentId = searchParams ? searchParams.get('paymentId') : null;
 
   useEffect(() => {
     const fetchPaymentLink = async () => {
       try {
         setLoading(true);
-        console.log('Iniciando a busca do QR Code de pagamento...');
 
         if (!paymentId) {
           throw new Error('ID de pagamento não encontrado nos parâmetros.');
@@ -29,16 +27,13 @@ export default function PagamentoPage() {
         });
 
         if (!response.ok) {
-          console.error('Erro ao gerar QR Code de pagamento:', response.statusText);
           throw new Error('Erro ao gerar QR Code de pagamento');
         }
 
         const data = await response.json();
         setQrCodeBase64(data.qr_code_base64); // `qr_code_base64` é a imagem em base64 do QR Code PIX
-        console.log('QR Code de pagamento obtido.');
       } catch (error: any) {
         setError(error.message || 'Erro desconhecido');
-        console.error('Erro ao buscar o QR Code de pagamento:', error);
       } finally {
         setLoading(false);
       }
@@ -64,4 +59,7 @@ export default function PagamentoPage() {
       </div>
     </div>
   );
-}
+};
+
+// Desativa a renderização no servidor para essa página
+export default dynamic(() => Promise.resolve(PagamentoPage), { ssr: false });
