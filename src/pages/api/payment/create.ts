@@ -52,10 +52,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    // Retorna o QR Code e link para pagamento PIX
+    // Retorna o QR Code e o link "copia e cola" para pagamento PIX
     res.status(200).json({
       qr_code: payment.body.point_of_interaction.transaction_data.qr_code,
       qr_code_base64: payment.body.point_of_interaction.transaction_data.qr_code_base64,
+      qr_code_copia_e_cola: payment.body.point_of_interaction.transaction_data.qr_code // "copia e cola" link
     });
   } catch (error) {
     console.error('Erro ao criar pagamento PIX:', error);

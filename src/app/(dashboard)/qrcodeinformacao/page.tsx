@@ -6,7 +6,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import NotificationButton from '@/components/ui/notification-button';
 
 export default function QRCodeInformacao() {
-  const qrCodeUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/captura`; // URL que o QR Code direcionará
+  const qrCodeUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/captura`;
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
 
@@ -15,7 +15,7 @@ export default function QRCodeInformacao() {
     try {
       const response = await fetch('/api/payment/status');
       const data = await response.json();
-      setPaymentStatus(data.status); // Atualiza o estado com o status do pagamento
+      setPaymentStatus(data.status);
     } catch (error) {
       console.error('Erro ao verificar o status do pagamento:', error);
     }
@@ -23,12 +23,12 @@ export default function QRCodeInformacao() {
 
   useEffect(() => {
     checkPaymentStatus();
-    const interval = setInterval(checkPaymentStatus, 5000); // Checa a cada 5 segundos
+    const interval = setInterval(checkPaymentStatus, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Função para converter o QR Code em uma imagem e compartilhar
-  const handleShare = async () => {
+  // Função para compartilhar o QR Code como imagem
+  const handleShareQRCode = async () => {
     try {
       const canvas = document.querySelector('canvas');
       if (!canvas) {
@@ -41,10 +41,12 @@ export default function QRCodeInformacao() {
       const blob = await response.blob();
       const file = new File([blob], 'qrcode.png', { type: 'image/png' });
 
+      const messageText = `Escaneie o QR Code ou clique no link para capturar os dados do usuário: ${qrCodeUrl}`;
+
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
           title: 'QR Code para Captura de Dados',
-          text: 'Escaneie o QR Code ou clique no link para capturar os dados do usuário.',
+          text: messageText,
           files: [file],
           url: qrCodeUrl,
         });
@@ -55,6 +57,27 @@ export default function QRCodeInformacao() {
     } catch (error) {
       console.error('Erro ao compartilhar QR Code:', error);
       alert('Erro ao compartilhar o QR Code.');
+    }
+  };
+
+  // Função para compartilhar apenas o link
+  const handleShareLink = async () => {
+    try {
+      const messageText = `Acesse o link para capturar os dados do usuário: ${qrCodeUrl}`;
+
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Link para Captura de Dados',
+          text: messageText,
+          url: qrCodeUrl,
+        });
+        console.log('Link compartilhado com sucesso!');
+      } else {
+        alert('Seu dispositivo não suporta o compartilhamento de links.');
+      }
+    } catch (error) {
+      console.error('Erro ao compartilhar o link:', error);
+      alert('Erro ao compartilhar o link.');
     }
   };
 
@@ -74,10 +97,17 @@ export default function QRCodeInformacao() {
       </div>
 
       <button
-        onClick={handleShare}
+        onClick={handleShareQRCode}
         className="mt-6 p-2 bg-green-500 font-semibold text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
       >
         Compartilhar QR Code
+      </button>
+
+      <button
+        onClick={handleShareLink}
+        className="mt-3 p-2 bg-blue-500 font-semibold text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Compartilhar Link
       </button>
 
       {paymentStatus === 'COMPLETED' && (
