@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start && npm run migrate",
     "lint": "next lint",
-    "postinstall": "prisma generate",
-    "migrate": "prisma migrate deploy",
+    "postinstall": "prisma generate && npm run migrate", 
+    "migrate": "prisma migrate deploy", 
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy"
   },
