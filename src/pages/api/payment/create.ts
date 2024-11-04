@@ -1,5 +1,3 @@
-// pages/api/payment/create.ts
-
 import mercadopago from 'mercadopago';
 import prisma from '@/lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
