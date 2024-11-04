@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  name           String
+  email          String     @unique
+  password       String
+  createdAt      DateTime   @default(now())
+  isAdmin        Boolean    @default(false)
+  sentBets       SentBet[]  
+}
+
+model PremiumBet {
+  id             Int       @id @default(autoincrement())
+  link           String
+  createdAt      DateTime   @default(now())
+  expiresAt      DateTime
+  isActive       Boolean    @default(true)
+  sentBets       SentBet[]  
+}
+
+model Payment {
+  id             Int           @id @default(autoincrement())
+  nome           String       
+  phone          String       
+  amount         Float
+  paymentStatus  PaymentStatus @default(PENDING)
+  paymentDate    DateTime?
+  createdAt      DateTime      @default(now())
+  mercadoPagoId  String?
+}
+
+
+model SentBet {
+  id             Int       @id @default(autoincrement())
+  user           User      @relation(fields: [userId], references: [id])
+  userId         Int
+  premiumBet     PremiumBet @relation(fields: [premiumBetId], references: [id])
+  premiumBetId   Int
+  sentAt         DateTime   @default(now())
+}
+
+model QRCodeValue {
+  id        Int      @id @default(autoincrement())
+  amount    Float?   @default(0.0)
+  updatedAt DateTime @updatedAt  
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model BankAccount {
+  id           Int      @id @default(autoincrement())
+  bankName     String   @default("Mercado Pago")
+  agencyNumber String
+  accountNumber String
+  accountHolder String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
